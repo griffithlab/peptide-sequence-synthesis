@@ -35,6 +35,13 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo "echo Complete run for $RUN_NAME"  >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
 
+    #TODO: Do not write stdout or stderr to storage1 initially, put them on scratch instead? Write to scratch and make a copy to storage1 at the end
+
+    #TODO: Copy the pvacseq log files to the final dir
+    #MHC_Class_I/log/inputs.yml 
+
+    #TODO: Create a minimal version of the all_epitopes file with only the sequence ID and the algorithm scores
+
     #Create the bsub command to run this script on the cluster
     echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 32000000 -G compute-oncology -n 8 -R 'select[mem>32000] rusage[mem=32000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:5.5.1)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
 
