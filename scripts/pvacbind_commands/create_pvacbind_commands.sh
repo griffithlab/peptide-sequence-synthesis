@@ -37,13 +37,11 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo "cut -f 1,11,12,13,14,16,18,20,22,24,26,28,30,32 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv" >> $SCRIPT_FILE
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo Completed run for $RUN_NAME" >> $SCRIPT_FILE
-    echo cp $SCRATCH_OUTDIR/pvacbind.stdout $FINAL_OUTDIR/pvacbind.stdout >> $SCRIPT_FILE
-    echo cp $SCRATCH_OUTDIR/pvacbind.stderr $FINAL_OUTDIR/pvacbind.stderr >> $SCRIPT_FILE
     echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
-    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 32000000 -G compute-oncology -n 8 -R 'select[mem>32000] rusage[mem=32000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $SCRATCH_OUTDIR/pvacbind.stdout -eo $SCRATCH_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
+    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 32000000 -G compute-oncology -n 8 -R 'select[mem>32000] rusage[mem=32000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
 
   done
 done
