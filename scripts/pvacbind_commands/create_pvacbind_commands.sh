@@ -1,10 +1,11 @@
 #!/bin/bash
 
+PEPTIDE_SET="1K"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
-FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/1M_Peptides
+FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
 ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_first-3.txt
 
 # Read alleles file into array
@@ -33,7 +34,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo "echo Using pvactools version: $PVACTOOLS_VERSION" >> $SCRIPT_FILE
     echo "echo Process predictions for $RUN_NAME" >> $SCRIPT_FILE
     echo mkdir -p $SCRATCH_OUTDIR >> $SCRIPT_FILE
-    echo pvacbind run $FASTA_BASE/reference_${LEN}mer_1M_mutated_1x.fasta $RUN_NAME $HLA all_class_i $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size 10000 >> $SCRIPT_FILE
+    echo pvacbind run $FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta $RUN_NAME $HLA all_class_i $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size 10000 >> $SCRIPT_FILE
     echo "cut -f 1,11,12,13,14,16,18,20,22,24,26,28,30,32 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv" >> $SCRIPT_FILE
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo Completed run for $RUN_NAME" >> $SCRIPT_FILE
@@ -41,7 +42,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo date >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
-    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 32000000 -G compute-oncology -n 8 -R 'select[mem>32000] rusage[mem=32000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
+    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 64000000 -G compute-oncology -n 8 -R 'select[mem>64000] rusage[mem=64000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
 
   done
 done
