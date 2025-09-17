@@ -1,0 +1,5 @@
+MHCnuggetsII IC50 Score
+NetMHCIIpan IC50 Score
+NetMHCIIpanEL Score
+NNalign IC50 Score
+SMMalign IC50 Score

@@ -1,0 +1,14 @@
+BigMHC_EL Score
+BigMHC_IM Score
+MHCflurryEL Processing Score
+MHCflurryEL Presentation Score
+MHCflurry IC50 Score
+MHCnuggetsI IC50 Score
+NetMHC IC50 Score
+NetMHCcons IC50 Score
+NetMHCpan IC50 Score
+NetMHCpanEL Score
+PickPocket IC50 Score
+SMM IC50 Score
+SMMPMBEC IC50 Score
+DeepImmuno Score
