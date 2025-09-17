@@ -35,10 +35,10 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo "echo Process predictions for $RUN_NAME" >> $SCRIPT_FILE
     echo mkdir -p $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo pvacbind run $FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta $RUN_NAME $HLA all_class_i $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size 10000 >> $SCRIPT_FILE
-    echo "cut -f 1,11,12,13,14,16,18,20,22,24,26,28,30,32 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv" >> $SCRIPT_FILE
+    echo "cut -f 1,11,12,13,14,16,18,20,22,24,26,28,30,32 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
+    echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo Completed run for $RUN_NAME" >> $SCRIPT_FILE
-    echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
