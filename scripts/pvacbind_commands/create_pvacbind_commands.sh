@@ -7,6 +7,12 @@ RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
 ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_first-3.txt
+RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
+RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
+
+#Initialize two files to hold the LSF commands and unique Run names:
+> $RUN_COMMAND_FILE
+> $RUN_NAME_FILE
 
 # Read alleles file into array
 mapfile -t HLA_ALLELES < "$ALLELES_FILE"
@@ -26,6 +32,8 @@ for HLA in "${HLA_ALLELES[@]}"; do
     SCRATCH_OUTDIR=${SCRATCH_BASE}/${LEN}/${RUN_NAME}
     FINAL_OUTDIR=${RESULTS_BASE}/${LEN}/${RUN_NAME}
     SCRIPT_FILE=${FINAL_OUTDIR}/${RUN_NAME}.sh
+    STATUS_FILE="${FINAL_OUTDIR}/${RUN_NAME}.status"
+
     mkdir -p $FINAL_OUTDIR
 
     #Create the bash script file for a single HLA-Allele and Length Combination
@@ -40,10 +48,15 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo Completed run for $RUN_NAME" >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
+    echo "echo Run script complete for $RUN_NAME > $STATUS_FILE" >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
-    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 64000000 -G compute-oncology -n 8 -R 'select[mem>64000] rusage[mem=64000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE"
+    echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 64000000 -G compute-oncology -n 8 -R 'select[mem>64000] rusage[mem=64000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
+    echo $RUN_NAME >> $RUN_NAME_FILE
 
   done
 done
+
+echo "Wrote all LSF commands to $RUN_COMMAND_FILE"
+echo "Wrote a corresponding list of run names to $RUN_NAME_FILE"
 
