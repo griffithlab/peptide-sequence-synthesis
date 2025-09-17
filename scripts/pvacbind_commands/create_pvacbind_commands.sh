@@ -17,7 +17,6 @@ RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt
 
 # Read alleles file into array
 mapfile -t HLA_ALLELES < "$ALLELES_FILE"
-mapfile -t classI_score_names < $SCORE_NAMES_FILE
 
 mkdir -p $RESULTS_BASE
 mkdir -p $SCRATCH_BASE
@@ -46,11 +45,12 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo "mkdir -p $SCRATCH_OUTDIR" >> $SCRIPT_FILE
     echo "pvacbind run $FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta $RUN_NAME $HLA all_class_i $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size 10000" >> $SCRIPT_FILE
 
+    echo mapfile -t classI_score_names \< $SCORE_NAMES_FILE >> $SCRIPT_FILE
     echo "header=\$(head -n 1 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv)" >> $SCRIPT_FILE
     echo positions=\(\) >> $SCRIPT_FILE
     echo i=1 >> $SCRIPT_FILE
     echo "for col in \$(echo \"\$header\" | tr '\t' '\n'); do" >> $SCRIPT_FILE
-    echo "    for name in \"\${score_names[@]}\"; do" >> $SCRIPT_FILE
+    echo "    for name in \"\${classI_score_names[@]}\"; do" >> $SCRIPT_FILE
     echo "       if [[ \"\$col\" == \"\$name\" ]]; then" >> $SCRIPT_FILE
     echo "            positions+=(\"\$i\")" >> $SCRIPT_FILE
     echo "        fi" >> $SCRIPT_FILE
