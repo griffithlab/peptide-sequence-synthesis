@@ -8,8 +8,8 @@ awk 'NR==FNR {rank[$0]=++i; next}
   | sort -n | cut -d' ' -f2- > pvacbind_valid_classI_alleles_ordered.txt
 
 cat pvacbind_valid_classI_alleles_ordered.txt | perl -ne 'chomp; if ($_ =~ /(HLA\-.*)/){print "$1\n"}' > pvacbind_valid_classI_alleles_ordered.txt2
-mv pvacbind_valid_classI_alleles_ordered.txt2 pvacbind_valid_classI_alleles_ordered.txt
 
+mv pvacbind_valid_classI_alleles_ordered.txt2 pvacbind_valid_classI_alleles_ordered-all.txt
 head -n 3 pvacbind_valid_classI_alleles_ordered.txt > pvacbind_valid_classI_alleles_ordered_first-3.txt
 head -n 1000 pvacbind_valid_classI_alleles_ordered.txt > pvacbind_valid_classI_alleles_ordered_first-1000.txt
 
