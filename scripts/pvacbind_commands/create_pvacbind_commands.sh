@@ -6,7 +6,7 @@ WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
-ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered.txt
+ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_first-1000.txt
 SCORE_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_score_names_5.5.2.txt
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
 RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
@@ -35,6 +35,12 @@ for HLA in "${HLA_ALLELES[@]}"; do
     SCRIPT_FILE=${FINAL_OUTDIR}/${RUN_NAME}.sh
     STATUS_FILE_RUNNING="${FINAL_OUTDIR}/${RUN_NAME}.status.running"
     STATUS_FILE_COMPLETED="${FINAL_OUTDIR}/${RUN_NAME}.status.completed"
+
+    #If the dir already exists, leave it untouched an continue on
+    if [ -d "$FINAL_OUTDIR" ]; then
+        echo "Final output dir for run $RUN_NAME already exists ... skipping"
+        continue
+    fi
 
     mkdir -p $FINAL_OUTDIR
 
