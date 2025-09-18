@@ -33,11 +33,13 @@ for HLA in "${HLA_ALLELES[@]}"; do
     SCRATCH_OUTDIR=${SCRATCH_BASE}/${LEN}/${RUN_NAME}
     FINAL_OUTDIR=${RESULTS_BASE}/${LEN}/${RUN_NAME}
     SCRIPT_FILE=${FINAL_OUTDIR}/${RUN_NAME}.sh
-    STATUS_FILE="${FINAL_OUTDIR}/${RUN_NAME}.status"
+    STATUS_FILE_RUNNING="${FINAL_OUTDIR}/${RUN_NAME}.status.running"
+    STATUS_FILE_COMPLETED="${FINAL_OUTDIR}/${RUN_NAME}.status.completed"
 
     mkdir -p $FINAL_OUTDIR
 
     #Create the bash script file for a single HLA-Allele and Length Combination
+    echo "echo \"Run script started for $RUN_NAME\" > $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
     echo "set -euo pipefail" > $SCRIPT_FILE
     echo "date" >> $SCRIPT_FILE
     echo "echo \"Using pvactools version: $PVACTOOLS_VERSION\"" >> $SCRIPT_FILE
@@ -66,7 +68,8 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo \"Completed run for $RUN_NAME\"" >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
-    echo "echo \"Run script complete for $RUN_NAME\" > $STATUS_FILE" >> $SCRIPT_FILE
+    echo rm -f $STATUS_FILE_RUNNING
+    echo "echo \"Run script complete for $RUN_NAME\" > $STATUS_FILE_COMPLETED" >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
     echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M 64000000 -G compute-oncology -n 8 -R 'select[mem>64000] rusage[mem=64000]' -q general -g /mgriffit/perc -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
