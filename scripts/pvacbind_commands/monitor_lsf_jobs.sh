@@ -1,6 +1,6 @@
 #Take the list of job commands and run names as input and iterate on them
 #!/bin/bash
-PEPTIDE_SET="1K"
+PEPTIDE_SET="100K"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-PEPTIDE_SET="1K"
+PEPTIDE_SET="100K"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
-ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_first-3.txt
+ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered.txt
 SCORE_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_score_names_5.5.2.txt
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
 RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
@@ -68,7 +68,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
     echo "echo \"Completed run for $RUN_NAME\"" >> $SCRIPT_FILE
     echo date >> $SCRIPT_FILE
-    echo rm -f $STATUS_FILE_RUNNING
+    echo "rm -f $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
     echo "echo \"Run script complete for $RUN_NAME\" > $STATUS_FILE_COMPLETED" >> $SCRIPT_FILE
 
     #Create the bsub command to run this script on the cluster
