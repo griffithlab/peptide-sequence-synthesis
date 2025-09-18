@@ -48,18 +48,18 @@ for HLA in "${HLA_ALLELES[@]}"; do
     echo mapfile -t classI_score_names \< $SCORE_NAMES_FILE >> $SCRIPT_FILE
     echo "header=\$(head -n 1 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv)" >> $SCRIPT_FILE
     echo positions=\(\) >> $SCRIPT_FILE
+
     echo i=1 >> $SCRIPT_FILE
-    echo "for col in \$(echo \"\$header\" | tr '\t' '\n'); do" >> $SCRIPT_FILE
+    echo "while IFS= read -r col; do" >> $SCRIPT_FILE
     echo "    for name in \"\${classI_score_names[@]}\"; do" >> $SCRIPT_FILE
     echo "       if [[ \"\$col\" == \"\$name\" ]]; then" >> $SCRIPT_FILE
     echo "            positions+=(\"\$i\")" >> $SCRIPT_FILE
     echo "        fi" >> $SCRIPT_FILE
     echo "    done" >> $SCRIPT_FILE
     echo "    ((i++))" >> $SCRIPT_FILE
-    echo "done" >> $SCRIPT_FILE
-    echo "cut_cols=\$(IFS=, ; echo \"\${positions[*]}\")" >> $SCRIPT_FILE
+    echo "done < <(echo \"\$header\" | tr '\t' '\n')" >> $SCRIPT_FILE
 
-    #echo "cut -f 1,11,12,13,14,16,18,20,22,24,26,28,30,32 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
+    echo "cut_cols=\$(IFS=, ; echo \"\${positions[*]}\")" >> $SCRIPT_FILE
     echo "cut -f 1,\${cut_cols} $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
 
     echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
