@@ -1,15 +1,26 @@
 #!/bin/bash
 
 PEPTIDE_SET="100K"
+ALLELE_SET="first-1000"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
-ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_first-1000.txt
+ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_${ALLELE_SET}.txt
 SCORE_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_score_names_5.5.2.txt
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
 RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
+
+if [ ! -f "$ALLELES_FILE" ]; then
+    echo "Error: Input file $ALLELES_FILE not found. Exiting."
+    exit 1
+fi
+
+if [ ! -f "$SCORE_NAMES_FILE" ]; then
+    echo "Error: Input file $SCORE_NAMES_FILE not found. Exiting."
+    exit 1
+fi
 
 #Initialize two files to hold the LSF commands and unique Run names:
 > $RUN_COMMAND_FILE
