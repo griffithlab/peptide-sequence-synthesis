@@ -9,8 +9,8 @@ SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results/$PVACTOOLS_VERSION
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
 ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_${ALLELE_SET}.txt
 SCORE_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_score_names_5.5.2.txt
-RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
-RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
+RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
 
 if [ ! -f "$ALLELES_FILE" ]; then
     echo "Error: Input file $ALLELES_FILE not found. Exiting."
