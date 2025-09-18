@@ -1,11 +1,12 @@
 #Take the list of job commands and run names as input and iterate on them
 #!/bin/bash
 PEPTIDE_SET="100K"
+ALLELE_SET="first-1000"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
-RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.sh"
-RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}.txt"
+RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
 SHORT_PAUSE=10
 LONG_PAUSE=300
 
