@@ -1,0 +1,13 @@
+BigMHC_EL
+BigMHC_IM
+MHCflurryEL
+MHCflurry
+MHCnuggetsI
+NetMHC
+NetMHCcons
+NetMHCpan
+NetMHCpanEL
+PickPocket
+SMM
+SMMPMBEC
+DeepImmuno

@@ -1,0 +1,7 @@
+Algorithm   Memory   CPUs
+MHCnuggetsII   4   1
+NNalign   4   1
+NetMHCIIpan   4   1
+NetMHCIIpanEL   4   1
+SMMalign   4   1
+all_class_ii   64   8

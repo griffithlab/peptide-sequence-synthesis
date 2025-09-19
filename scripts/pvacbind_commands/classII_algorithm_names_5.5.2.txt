@@ -1,0 +1,5 @@
+MHCnuggetsII
+NNalign
+NetMHCIIpan
+NetMHCIIpanEL
+SMMalign

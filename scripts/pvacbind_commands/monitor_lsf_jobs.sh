@@ -1,14 +1,17 @@
-#Take the list of job commands and run names as input and iterate on them
 #!/bin/bash
-PEPTIDE_SET="100K"
-ALLELE_SET="first-1000"
+
+PEPTIDE_SET="1K"
+ALLELE_SET="first-3"
 PVACTOOLS_VERSION="5.5.2"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
-RESULTS_BASE=$WORKING_BASE/pvacbind_results/$PVACTOOLS_VERSION
-RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
-RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}_${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
+RESULTS_BASE=$WORKING_BASE/pvacbind_results
+RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
 SHORT_PAUSE=10
 LONG_PAUSE=300
+
+#other parameters
+JOB_GROUP="/mgriffit/perc"
 
 #Get the unique command line and the job name for each job
 mapfile -t COMMANDS < ${RUN_COMMAND_FILE}
@@ -18,9 +21,12 @@ mapfile -t NAMES < ${RUN_NAME_FILE}
 for i in "${!COMMANDS[@]}"; do
     RUN_NAME="${NAMES[$i]}"
     CMD="${COMMANDS[$i]}"
-    LEN="${RUN_NAME%%_*}"
+    if [[ $line =~ LEN-([0-9]+)_.*_ALG-(.+)$ ]]; then
+      LEN="${BASH_REMATCH[1]}"
+      ALGO="${BASH_REMATCH[2]}"
+    fi
 
-    FINAL_OUTDIR=${RESULTS_BASE}/${LEN}/${RUN_NAME}
+    FINAL_OUTDIR=${RESULTS_BASE}/${PVACTOOLS_VERSION}/${LEN}/${ALGO}/${RUN_NAME}
     STATUS_FILE_RUNNING="${FINAL_OUTDIR}/${RUN_NAME}.status.running"
     STATUS_FILE_COMPLETED="${FINAL_OUTDIR}/${RUN_NAME}.status.completed"
 
@@ -49,10 +55,10 @@ for i in "${!COMMANDS[@]}"; do
     while true; do
         # Re-run bjgroup each loop to get updated counts
         read N_JOBS JOBS_RUNNING JOB_GROUP_LIMIT < <(
-            bjgroup -s /mgriffit/perc | awk 'NR==2 {split($9,a,"/"); print $2, a[1], a[2]}'
+            bjgroup -s $JOB_GROUP | awk 'NR==2 {split($9,a,"/"); print $2, a[1], a[2]}'
         )
         # Get number of jobs in the job group actually present in the queue (N_JOBS from above seems to include completed jobs). 
-        JOBS_SUBMITTED=$(bjobs -g /mgriffit/perc 2>/dev/null | grep -v JOBID | cut -d " " -f 1 | grep -P "^\d+" | wc -l)
+        JOBS_SUBMITTED=$(bjobs -g "$JOB_GROUP" 2>/dev/null | grep -v JOBID | cut -d " " -f 1 | grep -P "^\d+" | wc -l)
 
 	#If the job group is not currently full + 1, submit a new job (i.e. always have one more job in the queue than the size of the job group)
         if (( JOBS_SUBMITTED < JOB_GROUP_LIMIT + 1 )); then
