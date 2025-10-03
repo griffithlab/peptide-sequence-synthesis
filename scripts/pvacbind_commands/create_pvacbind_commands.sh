@@ -4,6 +4,7 @@
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
 PVACTOOLS_VERSION="5.5.2"
+FASTA_SIZE=1000
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results
@@ -94,7 +95,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "echo \"Using pvactools version: $PVACTOOLS_VERSION\"" >> $SCRIPT_FILE
       echo "echo \"Generating predictions for $RUN_NAME\"" >> $SCRIPT_FILE
       echo "mkdir -p $SCRATCH_OUTDIR" >> $SCRIPT_FILE
-      echo "pvacbind run $PEPTIDE_SET_FILE $RUN_NAME $HLA $ALGO $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size 10000" >> $SCRIPT_FILE
+      echo "pvacbind run $PEPTIDE_SET_FILE $RUN_NAME $HLA $ALGO $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size $FASTA_SIZE" >> $SCRIPT_FILE
 
       #cut out only the score columns for relevant algorithms present in this ouput
       echo mapfile -t classI_score_names \< $SCORE_NAMES_FILE >> $SCRIPT_FILE
