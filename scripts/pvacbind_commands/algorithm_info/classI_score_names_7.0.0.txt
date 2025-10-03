@@ -12,3 +12,5 @@ PickPocket IC50 Score
 SMM IC50 Score
 SMMPMBEC IC50 Score
 DeepImmuno Score
+MixMHCpred Binding Score
+PRIME Immunogenicity Score

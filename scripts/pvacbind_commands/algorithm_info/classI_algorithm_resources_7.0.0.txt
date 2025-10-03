@@ -12,4 +12,6 @@ PickPocket   4   1
 SMM   4   1
 SMMPMBEC   4   1
 DeepImmuno   4   1
+MixMHCpred   4   1
+PRIME   4   1
 all_class_i   64   8

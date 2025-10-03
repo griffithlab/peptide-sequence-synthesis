@@ -11,3 +11,5 @@ PickPocket
 SMM
 SMMPMBEC
 DeepImmuno
+MixMHCpred
+PRIME
