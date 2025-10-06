@@ -1,0 +1,5 @@
+MHCnuggetsII: 11-30
+NNalign: 11-30
+NetMHCIIpan: 11-30
+NetMHCIIpanEL: 11-30
+SMMalign: 11-30

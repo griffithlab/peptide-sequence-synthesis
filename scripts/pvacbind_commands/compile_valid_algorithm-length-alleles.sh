@@ -1,4 +1,8 @@
-#get valid alleles for each algorithm from pvactools
+#Get valid alleles for each algorithm from pvactools
+#Also get valid lengths for each algorithm from a defined expectation (saved in a config file)
+#For a few algorithms with different lengths valid for each HLA alleles, import those separately
+#Once all this info is gathered produce a master list of valid Length-HLA-Algorithm combinations for which we expect calculations to be possible
+
 #isub -p false -i 'susannakiwala/pvactools:7.0.0a6' -m 4
 
 PVACTOOLS_VERSION="7.0.0"
@@ -26,13 +30,25 @@ while IFS=":" read -r alg range; do
     alg=$(echo "$alg" | xargs)        # trim whitespace
     min=$(echo "$range" | cut -d- -f1 | xargs)
     max=$(echo "$range" | cut -d- -f2 | xargs)
+    
+    ALG_FILE="$WORKING_BASE/algorithm_allele_length_key/algorithm_alleles/${alg}.valid_alleles.txt"
+
+    # Skip to the next iteration if the algorithm HLA file does not exist or is empty
+    if [[ ! -f "$ALG_FILE"  || "$alg" == "SMM" || "$alg" == "SMMPMBEC" ]]; then
+      echo "Skipping $alg — file not found: $ALG_FILE"
+      continue
+    fi
+
+    mapfile -t HLAS < $ALG_FILE
 
     echo "Algorithm: $alg (range $min-$max)"
     for ((len=min; len<=max; len++)); do
         echo "  Length: $len"
 
         # Get the valid HLA alleles for this algorithm and create a key string: 
-
+        for HLA_NAME in "${HLAS[@]}"; do
+          RUN_NAME=LEN-${len}_${HLA_NAME}_ALG-${alg}
+        done
     done
 done < "$ALG_SUPPORTED_LENGTHS_FILE"
 

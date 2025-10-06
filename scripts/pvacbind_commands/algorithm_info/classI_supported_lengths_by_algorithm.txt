@@ -1,5 +1,3 @@
-#from Susanna
-
 #for the following algorithms, if an allele is supported it should work for these lengths
 MHCnuggets: 8-15
 DeepImmuno: 9-10
@@ -8,16 +6,11 @@ BigMHC_IM: 8-15
 MHCflurry: 8-15
 MHCflurryEL: 8-15
 MHCnuggetsI: 8-15
-MHCnuggetsII: 11-30
 NetMHC: 8-14
 NetMHCcons: 8-14
 NetMHCpan: 8-14
 NetMHCpanEL: 8-14
 PickPocket: 8-11
-NetMHCIIpan: 11-30
-NetMHCIIpanEL: 11-30
-SMMalign: 11-30
-NNalign: 11-30
 MixMHCpred: 8-14
 PRIME: 8-14
 
