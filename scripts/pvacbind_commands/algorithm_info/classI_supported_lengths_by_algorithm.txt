@@ -1,5 +1,4 @@
 #for the following algorithms, if an allele is supported it should work for these lengths
-MHCnuggets: 8-15
 DeepImmuno: 9-10
 BigMHC_EL: 8-15
 BigMHC_IM: 8-15

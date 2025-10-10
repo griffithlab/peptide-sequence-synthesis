@@ -3,16 +3,18 @@
 #inputs
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
-PVACTOOLS_VERSION="5.5.2"
+PVACTOOLS_VERSION="7.0.0"
 FASTA_SIZE=1000
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
+SCRIPT_BASE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
 SCRATCH_BASE=/scratch1/fs1/mgriffit/pvacbind_results
 FASTA_BASE=$WORKING_BASE/peptide-sequence-synthesis/data/${PEPTIDE_SET}_Peptides
-ALLELES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/pvacbind_valid_classI_alleles_ordered_${ALLELE_SET}.txt
-SCORE_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_score_names_${PVACTOOLS_VERSION}.txt
-ALG_NAMES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_algorithm_names_${PVACTOOLS_VERSION}.txt
-ALG_RESOURCES_FILE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands/classI_algorithm_resources_${PVACTOOLS_VERSION}.txt
+ALLELES_FILE=$SCRIPT_BASE/rank_hla_alleles/pvacbind_valid_classI_alleles_ordered_${ALLELE_SET}.txt
+SCORE_NAMES_FILE=$SCRIPT_BASE/algorithm_info/classI_score_names_${PVACTOOLS_VERSION}.txt
+ALG_NAMES_FILE=$SCRIPT_BASE/algorithm_info/classI_algorithm_names_${PVACTOOLS_VERSION}.txt
+ALG_RESOURCES_FILE=$SCRIPT_BASE/algorithm_info/classI_algorithm_resources_${PVACTOOLS_VERSION}.txt
+VALID_KEYS_FILE=$SCRIPT_BASE/algorithm_allele_length_key/Length-HLA-Algorithm_Keys_${PVACTOOLS_VERSION}.txt
 
 #outputs
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
@@ -30,11 +32,24 @@ if [ ! -f "$ALLELES_FILE" ]; then
     echo "Error: Input file $ALLELES_FILE not found. Exiting."
     exit 1
 fi
-
 if [ ! -f "$SCORE_NAMES_FILE" ]; then
     echo "Error: Input file $SCORE_NAMES_FILE not found. Exiting."
     exit 1
 fi
+if [[ ! -f "$VALID_KEYS_FILE" ]]; then
+  echo "Error: valid keys file not found: $VALID_KEYS_FILE"
+  exit 1
+fi
+
+# Declare associative array for fast lookups and load the valid keys
+declare -A VALID_KEYS
+
+# Load valid keys into the array
+while read -r key; do
+  [[ -z "$key" || "$key" =~ ^# ]] && continue  # skip empty/comment lines
+  VALID_KEYS["$key"]=1
+done < "$VALID_KEYS_FILE"
+echo "Loaded ${#VALID_KEYS[@]} valid keys."
 
 #Initialize two files to hold the LSF commands and unique Run names:
 > $RUN_COMMAND_FILE
@@ -77,6 +92,12 @@ for HLA in "${HLA_ALLELES[@]}"; do
       SCRIPT_FILE=${FINAL_OUTDIR}/${RUN_NAME}.sh
       STATUS_FILE_RUNNING="${FINAL_OUTDIR}/${RUN_NAME}.status.running"
       STATUS_FILE_COMPLETED="${FINAL_OUTDIR}/${RUN_NAME}.status.completed"
+
+      #If the RUN_NAME does not correspond to a valid Length-Allele-Algorithm combination, skip it.
+      if [[ -z "${VALID_KEYS[$RUN_NAME]}" ]]; then
+        echo "Skipping invalid key: $RUN_NAME"
+        continue
+      fi
 
       #If the dir already exists, leave it untouched an continue on
       if [ -d "$FINAL_OUTDIR" ]; then
