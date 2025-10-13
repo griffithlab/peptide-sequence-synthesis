@@ -128,7 +128,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
 
       #cut out only the score columns for relevant algorithms present in this ouput
       echo mapfile -t classI_score_names \< $SCORE_NAMES_FILE >> $SCRIPT_FILE
-      echo "header=\$(head -n 1 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv)" >> $SCRIPT_FILE
+      echo "header=\$(head -n 1 $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.MHC_I.all_epitopes.tsv)" >> $SCRIPT_FILE
       echo positions=\(\) >> $SCRIPT_FILE
       echo i=1 >> $SCRIPT_FILE
       echo "while IFS= read -r col; do" >> $SCRIPT_FILE
@@ -141,7 +141,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "done < <(echo \"\$header\" | tr '\t' '\n')" >> $SCRIPT_FILE
 
       echo "cut_cols=\$(IFS=, ; echo \"\${positions[*]}\")" >> $SCRIPT_FILE
-      echo "cut -f \${cut_cols} $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
+      echo "cut -f \${cut_cols} $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.MHC_I.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
 
       #save the pvacbind log file, remove the scratch dir, log a completion message and ending date, remove the running status file
       echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
