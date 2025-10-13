@@ -2,7 +2,7 @@
 
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
-PVACTOOLS_VERSION="5.5.2"
+PVACTOOLS_VERSION="7.0.0"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
@@ -49,7 +49,6 @@ for i in "${!COMMANDS[@]}"; do
     fi
 
     echo -e "Status files do not already exist for run: $RUN_NAME - checking whether the job for this run can be submitted to the job group now"
-
 
     #If the job has not already been run, check the LSF job group & the number of jobs submitted to that group
     while true; do

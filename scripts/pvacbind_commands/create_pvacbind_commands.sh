@@ -3,6 +3,7 @@
 #inputs
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
+DOCKERHUB_ORG="susannakiwala" #susannakiwala / griffithlab
 PVACTOOLS_VERSION="7.0.0"
 FASTA_SIZE=1000
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
@@ -45,6 +46,7 @@ fi
 declare -A VALID_KEYS
 
 # Load valid keys into the array
+echo -e "\nLoading valid Length-HLA-Algorithm keys into memory"
 while read -r key; do
   [[ -z "$key" || "$key" =~ ^# ]] && continue  # skip empty/comment lines
   VALID_KEYS["$key"]=1
@@ -56,12 +58,16 @@ echo "Loaded ${#VALID_KEYS[@]} valid keys."
 > $RUN_NAME_FILE
 
 # Read HLA allele name into an array from the input file
+echo -e "\nLoading prioritized alleles file:"
+echo $ALLELES_FILE
 mapfile -t HLA_ALLELES < "$ALLELES_FILE"
 
 # Read algorithms to be used into an array from the input file
+echo -e "\nLoading algorithm list"
 mapfile -t ALGORITHMS < "$ALG_NAMES_FILE"
 
 # Read in algorithm name link to resource use requirements for each. Skip header line
+echo -e "\nLoading resource settings for each algorithm"
 declare -A MEM_REQ
 declare -A CPU_REQ
 while read -r ALGO MEM CPU; do
@@ -73,7 +79,9 @@ mkdir -p $RESULTS_BASE/${PVACTOOLS_VERSION}
 mkdir -p $SCRATCH_BASE/${PVACTOOLS_VERSION}
 
 # Loop through arrays
+echo -e "\nBeginning to work on creating commands for each HLA allele, length and algorithm\n"
 for HLA in "${HLA_ALLELES[@]}"; do
+  echo -e "\nWorking on creating jobs for HLA: $HLA"
   for LEN in "${LENGTHS[@]}"; do
     PEPTIDE_SET_FILE=$FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta
     for ALGO in "${ALGORITHMS[@]}"; do
@@ -95,13 +103,13 @@ for HLA in "${HLA_ALLELES[@]}"; do
 
       #If the RUN_NAME does not correspond to a valid Length-Allele-Algorithm combination, skip it.
       if [[ -z "${VALID_KEYS[$RUN_NAME]}" ]]; then
-        echo "Skipping invalid key: $RUN_NAME"
+        echo -e "\tSkipping invalid key: $RUN_NAME"
         continue
       fi
 
       #If the dir already exists, leave it untouched an continue on
       if [ -d "$FINAL_OUTDIR" ]; then
-	  echo "Final output dir for run $RUN_NAME already exists ... skipping"
+	  echo -e "\tFinal output dir for run $RUN_NAME already exists ... skipping"
 	  continue
       fi
 
@@ -158,12 +166,12 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "echo \"Run script complete for $RUN_NAME\" > $STATUS_FILE_COMPLETED" >> $SCRIPT_FILE
 
       #Create the bsub command to run this script on the cluster
-      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(griffithlab/pvactools:$PVACTOOLS_VERSION)' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
+      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
       echo $RUN_NAME >> $RUN_NAME_FILE
     done
   done
 done
 
-echo "Wrote all LSF commands to $RUN_COMMAND_FILE"
+echo -e "\nWrote all LSF commands to $RUN_COMMAND_FILE"
 echo "Wrote a corresponding list of run names to $RUN_NAME_FILE"
 
