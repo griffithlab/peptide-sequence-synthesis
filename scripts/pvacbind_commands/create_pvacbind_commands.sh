@@ -4,7 +4,7 @@
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
 DOCKERHUB_ORG="susannakiwala" #susannakiwala / griffithlab
-PVACTOOLS_VERSION="7.0.0"
+PVACTOOLS_VERSION="7.0.0a6"
 FASTA_SIZE=1000
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 SCRIPT_BASE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands

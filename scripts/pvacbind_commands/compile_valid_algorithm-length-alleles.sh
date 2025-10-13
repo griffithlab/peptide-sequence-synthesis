@@ -5,7 +5,7 @@
 
 #isub -p false -i 'susannakiwala/pvactools:7.0.0a6' -m 4
 
-PVACTOOLS_VERSION="7.0.0"
+PVACTOOLS_VERSION="7.0.0a6"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles/peptide-sequence-synthesis/scripts/pvacbind_commands
 ALG_NAMES_FILE=$WORKING_BASE/algorithm_info/classI_algorithm_names_${PVACTOOLS_VERSION}.txt
 ALG_SUPPORTED_LENGTHS_FILE=$WORKING_BASE/algorithm_info/classI_supported_lengths_by_algorithm.txt
