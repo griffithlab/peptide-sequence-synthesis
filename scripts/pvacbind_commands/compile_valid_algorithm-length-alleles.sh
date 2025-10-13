@@ -65,6 +65,9 @@ while IFS=":" read -r alg range; do
             #  echo "    HLA name does not match A/B/C $HLA_NAME"
             #  continue
             #fi
+
+            HLA_NAME="${HLA_NAME//\*/_}"
+            HLA_NAME="${HLA_NAME//\:/_}"
             RUN_NAME=LEN-${len}_${HLA_NAME}_ALG-${alg}
             echo $RUN_NAME >> $OUTPUT_KEY_FILE
         done
@@ -91,6 +94,8 @@ while read -r species HLA_NAME len; do
   #    continue
   #fi
 
+  HLA_NAME="${HLA_NAME//\*/_}"
+  HLA_NAME="${HLA_NAME//\:/_}"
   RUN_NAME=LEN-${len}_${HLA_NAME}_ALG-${alg}
   echo $RUN_NAME >> $OUTPUT_KEY_FILE
 
@@ -116,6 +121,8 @@ while read -r species HLA_NAME len; do
   #    continue
   #fi
 
+  HLA_NAME="${HLA_NAME//\*/_}"
+  HLA_NAME="${HLA_NAME//\:/_}"
   RUN_NAME=LEN-${len}_${HLA_NAME}_ALG-${alg}
   echo $RUN_NAME >> $OUTPUT_KEY_FILE
 
