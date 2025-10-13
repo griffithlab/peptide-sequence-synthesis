@@ -124,7 +124,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "echo \"Using pvactools version: $PVACTOOLS_VERSION\"" >> $SCRIPT_FILE
       echo "echo \"Generating predictions for $RUN_NAME\"" >> $SCRIPT_FILE
       echo "mkdir -p $SCRATCH_OUTDIR" >> $SCRIPT_FILE
-      echo "pvacbind run $PEPTIDE_SET_FILE $RUN_NAME $HLA $ALGO $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads 8 --iedb-install-directory /opt/iedb --fasta-size $FASTA_SIZE" >> $SCRIPT_FILE
+      echo "pvacbind run $PEPTIDE_SET_FILE $RUN_NAME $HLA $ALGO $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads $CPUS --iedb-install-directory /opt/iedb --fasta-size $FASTA_SIZE" >> $SCRIPT_FILE
 
       #cut out only the score columns for relevant algorithms present in this ouput
       echo mapfile -t classI_score_names \< $SCORE_NAMES_FILE >> $SCRIPT_FILE
