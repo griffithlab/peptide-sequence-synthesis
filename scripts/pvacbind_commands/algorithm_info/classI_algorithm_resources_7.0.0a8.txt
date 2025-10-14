@@ -1,17 +1,17 @@
-Algorithm   Memory   CPUs
-BigMHC_EL   6   1
-BigMHC_IM   4   1
-MHCflurryEL   4   1
-MHCflurry   4   1
-MHCnuggetsI   4   1
-NetMHC   4   1
-NetMHCcons   4   1
-NetMHCpan   4   1
-NetMHCpanEL   4   1
-PickPocket   4   1
-SMM   4   1
-SMMPMBEC   4   1
-DeepImmuno   4   1
-MixMHCpred   4   1
-PRIME   4   1
-all_class_i   64   8
+Algorithm   Memory   CPUs   FastaSize
+BigMHC_EL   4   1   500
+BigMHC_IM   4   1   500
+MHCflurryEL   4   1   1000
+MHCflurry   4   1   1000
+MHCnuggetsI   4   1   1000
+NetMHC   4   1   1000
+NetMHCcons   4   1   1000
+NetMHCpan   4   1   1000
+NetMHCpanEL   4   1   1000
+PickPocket   4   1   1000
+SMM   4   1   1000
+SMMPMBEC   4   1   1000
+DeepImmuno   4   1   1000
+MixMHCpred   4   1   1000
+PRIME   4   1   1000
+all_class_i   64   8   1000

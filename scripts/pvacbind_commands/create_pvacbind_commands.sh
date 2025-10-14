@@ -5,7 +5,6 @@ PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
 DOCKERHUB_ORG="susannakiwala" #susannakiwala / griffithlab
 PVACTOOLS_VERSION="7.0.0a8"
-FASTA_SIZE=1000
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 SCRIPT_BASE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
@@ -70,9 +69,11 @@ mapfile -t ALGORITHMS < "$ALG_NAMES_FILE"
 echo -e "\nLoading resource settings for each algorithm"
 declare -A MEM_REQ
 declare -A CPU_REQ
-while read -r ALGO MEM CPU; do
+declare -A FSIZE_REQ
+while read -r ALGO MEM CPU FSIZE; do
     MEM_REQ[$ALGO]=$MEM
     CPU_REQ[$ALGO]=$CPU
+    FSIZE_REQ[$ALGO]=$FSIZE    
 done < <(tail -n +2 $ALG_RESOURCES_FILE)
 
 mkdir -p $RESULTS_BASE/${PVACTOOLS_VERSION}
@@ -89,6 +90,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       MEM_SHORT=$(( MEM * 1000 ))
       MEM_LONG=$(( MEM * 1000000 ))
       CPUS=${CPU_REQ[$ALGO]}
+      FASTA_SIZE=${FSIZE_REQ[$ALGO]}
       QUEUE=${QUEUES[$(( COUNTER % QUEUE_COUNT ))]}
       ((COUNTER++))
 
