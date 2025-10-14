@@ -2,7 +2,7 @@
 
 PEPTIDE_SET="1K"
 ALLELE_SET="first-3"
-PVACTOOLS_VERSION="7.0.0a6"
+PVACTOOLS_VERSION="7.0.0a8"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
 RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"

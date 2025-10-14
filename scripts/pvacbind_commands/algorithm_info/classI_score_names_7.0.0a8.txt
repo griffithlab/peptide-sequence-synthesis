@@ -1,5 +1,5 @@
-BigMHC_EL Score
-BigMHC_IM Score
+BigMHC_EL Presentation Score
+BigMHC_IM Immunogenicity Score
 MHCflurryEL Processing Score
 MHCflurryEL Presentation Score
 MHCflurry IC50 Score
@@ -7,10 +7,10 @@ MHCnuggetsI IC50 Score
 NetMHC IC50 Score
 NetMHCcons IC50 Score
 NetMHCpan IC50 Score
-NetMHCpanEL Score
+NetMHCpanEL Presentation Score
 PickPocket IC50 Score
 SMM IC50 Score
 SMMPMBEC IC50 Score
-DeepImmuno Score
+DeepImmuno Immunogenicity Score
 MixMHCpred Binding Score
 PRIME Immunogenicity Score

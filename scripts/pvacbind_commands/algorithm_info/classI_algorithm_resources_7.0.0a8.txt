@@ -1,5 +1,5 @@
 Algorithm   Memory   CPUs
-BigMHC_EL   4   1
+BigMHC_EL   6   1
 BigMHC_IM   4   1
 MHCflurryEL   4   1
 MHCflurry   4   1
