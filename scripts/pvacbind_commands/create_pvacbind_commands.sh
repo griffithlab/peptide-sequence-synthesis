@@ -86,6 +86,8 @@ for HLA in "${HLA_ALLELES[@]}"; do
   for LEN in "${LENGTHS[@]}"; do
     PEPTIDE_SET_FILE=$FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta
     for ALGO in "${ALGORITHMS[@]}"; do
+
+
       MEM=${MEM_REQ[$ALGO]}
       MEM_SHORT=$(( MEM * 1000 ))
       MEM_LONG=$(( MEM * 1000000 ))
@@ -102,6 +104,9 @@ for HLA in "${HLA_ALLELES[@]}"; do
       SCRIPT_FILE=${FINAL_OUTDIR}/${RUN_NAME}.sh
       STATUS_FILE_RUNNING="${FINAL_OUTDIR}/${RUN_NAME}.status.running"
       STATUS_FILE_COMPLETED="${FINAL_OUTDIR}/${RUN_NAME}.status.completed"
+      
+      ALL_EPITOPES_FILE=$SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.MHC_I.all_epitopes.tsv
+      ALL_EPITOPES_SORTED_FILE=$SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.MHC_I.all_epitopes.sorted.tsv
 
       #If the RUN_NAME does not correspond to a valid Length-Allele-Algorithm combination, skip it.
       if [[ -z "${VALID_KEYS[$RUN_NAME]}" ]]; then
@@ -143,7 +148,10 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "done < <(echo \"\$header\" | tr '\t' '\n')" >> $SCRIPT_FILE
 
       echo "cut_cols=\$(IFS=, ; echo \"\${positions[*]}\")" >> $SCRIPT_FILE
-      echo "cut -f \${cut_cols} $SCRATCH_OUTDIR/MHC_Class_I/${RUN_NAME}.MHC_I.all_epitopes.tsv | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
+      #make sure the all epitopes file is sorted by numeric ID in first column to ensure consistent order matches input peptide set
+      #note that the input peptide set must have numeric IDs for each peptide in numeric order
+      echo "(head -n 1 $ALL_EPITOPES_FILE && tail -n +2 $ALL_EPITOPES_FILE | sort -k1,1n) > $ALL_EPITOPES_SORTED_FILE" >> $SCRIPT_FILE
+      echo "cut -f \${cut_cols} $ALL_EPITOPES_SORTED_FILE | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
 
       #save the pvacbind log file, remove the scratch dir, log a completion message and ending date, remove the running status file
       echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
