@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #inputs
-PEPTIDE_SET="1K"
+PEPTIDE_SET="100K"
 ALLELE_SET="first-3"
 DOCKERHUB_ORG="susannakiwala" #susannakiwala / griffithlab
 PVACTOOLS_VERSION="7.0.0a8"
@@ -124,9 +124,9 @@ for HLA in "${HLA_ALLELES[@]}"; do
 
       #Create the bash script file to run pVACbind for a single HLA allele, length and algorithm combination
       #create a status file to indicate this job is running
-      echo "SECONDS=0" >> $SCRIPT_FILE
+      echo "SECONDS=0" > $SCRIPT_FILE
       echo "echo \"Run script started for $RUN_NAME\" > $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
-      echo "set -euo pipefail" > $SCRIPT_FILE
+      echo "set -euo pipefail" >> $SCRIPT_FILE
       echo "date" >> $SCRIPT_FILE
       echo "echo \"Using pvactools version: $PVACTOOLS_VERSION\"" >> $SCRIPT_FILE
       echo "echo \"Generating predictions for $RUN_NAME\"" >> $SCRIPT_FILE
@@ -153,15 +153,17 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "(head -n 1 $ALL_EPITOPES_FILE && tail -n +2 $ALL_EPITOPES_FILE | sort -k1,1n) > $ALL_EPITOPES_SORTED_FILE" >> $SCRIPT_FILE
       echo "cut -f \${cut_cols} $ALL_EPITOPES_SORTED_FILE | gzip > $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz" >> $SCRIPT_FILE
 
+      #get the count of score lines from this final file
+      echo "SCORE_COUNT=\$(zcat $FINAL_OUTDIR/${RUN_NAME}.scores.tsv.gz | tail -n +2 | wc -l)" >> $SCRIPT_FILE
+
       #save the pvacbind log file, remove the scratch dir, log a completion message and ending date, remove the running status file
       echo cp $SCRATCH_OUTDIR/MHC_Class_I/log/inputs.yml $FINAL_OUTDIR/pvacseq_inputs_classI.yml >> $SCRIPT_FILE
       echo rm -fr $SCRATCH_OUTDIR >> $SCRIPT_FILE
       echo "echo \"Completed run for $RUN_NAME\"" >> $SCRIPT_FILE
       echo date >> $SCRIPT_FILE
-      echo "rm -f $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
 
       #output other basic information about this run (source of inputs, resources used, etc.) so that it gets saved in stdout
-      echo "echo -e \"\nRun info:\nRUN_NAME: $RUN_NAME\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION\nALLELES_FILE: $ALLELES_FILE\nPEPTIDE_SET_FILE: $PEPTIDE_SET_FILE\nMEM: $MEM\nCPUS: $CPUS\"" >> $SCRIPT_FILE
+      echo "echo -e \"\nRUN INFORMATION:\nRUN_NAME: $RUN_NAME\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION\nALLELES_FILE: $ALLELES_FILE\nPEPTIDE_SET_FILE: $PEPTIDE_SET_FILE\"" >> $SCRIPT_FILE
 
       #report on how long this run took
       echo "elapsed=\$SECONDS" >> $SCRIPT_FILE
@@ -171,9 +173,17 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "seconds=\$(( elapsed % 60 ))" >> $SCRIPT_FILE
       echo "echo \"Elapsed: \${days}d \${hours}h \${minutes}m \${seconds}s\"" >> $SCRIPT_FILE
       echo "echo \"Run took \$SECONDS seconds to complete\"" >> $SCRIPT_FILE
+      
+      #output stats for benchmarking
+      echo "echo -e \"\nBENCHMARKING STATISTICS\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION\nRUN_NAME: $RUN_NAME\nHLA: $HLA_NAME\nLENGTH: $LEN\nALGORITHM: $ALGO\nMEM: $MEM\nCPUS: $CPUS\nFASTA_SIZE: $FASTA_SIZE\"" >> $SCRIPT_FILE
+      echo "echo \"SECONDS: \$SECONDS\"" >> $SCRIPT_FILE
+      echo "echo -e \"SCORE_COUNT: \$SCORE_COUNT\n\"" >> $SCRIPT_FILE
 
       #create a status file to indicate the run succeeded
       echo "echo \"Run script complete for $RUN_NAME\" > $STATUS_FILE_COMPLETED" >> $SCRIPT_FILE
+
+      #delete the running status file if the script made it to here
+      echo "rm -f $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
 
       #Create the bsub command to run this script on the cluster
       echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
