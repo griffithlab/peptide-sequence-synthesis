@@ -87,7 +87,6 @@ for HLA in "${HLA_ALLELES[@]}"; do
     PEPTIDE_SET_FILE=$FASTA_BASE/reference_${LEN}mer_${PEPTIDE_SET}_mutated_1x.fasta
     for ALGO in "${ALGORITHMS[@]}"; do
 
-
       MEM=${MEM_REQ[$ALGO]}
       MEM_SHORT=$(( MEM * 1000 ))
       MEM_LONG=$(( MEM * 1000000 ))
@@ -113,11 +112,21 @@ for HLA in "${HLA_ALLELES[@]}"; do
         echo -e "\tSkipping invalid key: $RUN_NAME"
         continue
       fi
+      
+      #Store the name of the valid run (even if already complete)
+      echo $RUN_NAME >> $RUN_NAME_FILE
 
-      #If the dir already exists, leave it untouched an continue on
-      if [ -d "$FINAL_OUTDIR" ]; then
-	  echo -e "\tFinal output dir for run $RUN_NAME already exists ... skipping"
-	  continue
+      #If the completed status file exists then leave it untouched and continue
+      if [[ -f "$STATUS_FILE_COMPLETED" ]]; then
+        echo -e "\tCompletion status files exist for $RUN_NAME — skipping to next"
+        continue
+      fi
+      
+      #If the dir already exists, but the completion status file was NOT found - start fresh
+      if [[ -d "$FINAL_OUTDIR" ]]; then
+        echo -e "\t$FINAL_OUTDIR exists but run not completed — emptying run directories..."
+        rm -rf "${FINAL_OUTDIR:?}/"*
+        rm -rf "${SCRATCH_OUTDIR:?}/"*
       fi
 
       mkdir -p $FINAL_OUTDIR
@@ -186,8 +195,8 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "rm -f $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
 
       #Create the bsub command to run this script on the cluster
+      #Note if any jobs were already completed they will not be included here
       echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
-      echo $RUN_NAME >> $RUN_NAME_FILE
     done
   done
 done

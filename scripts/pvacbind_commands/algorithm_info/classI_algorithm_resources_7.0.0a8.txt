@@ -5,10 +5,10 @@ MHCflurryEL   4   1   1000
 MHCflurry   4   1   1000
 MHCnuggetsI   4   1   1000
 NetMHC   4   1   1000
-NetMHCcons   8   8   250
+NetMHCcons   8   8   500
 NetMHCpan   6   4   500
 NetMHCpanEL   6   4   500
-PickPocket   4   4   500
+PickPocket   8   8   500
 SMM   4   1   1000
 SMMPMBEC   4   1   1000
 DeepImmuno   4   1   1000
