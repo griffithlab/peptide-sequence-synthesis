@@ -1,6 +1,6 @@
 Algorithm   Memory   CPUs   FastaSize
-BigMHC_EL   4   1   500
-BigMHC_IM   4   1   500
+BigMHC_EL   6   1   500
+BigMHC_IM   6   1   500
 MHCflurryEL   4   1   1000
 MHCflurry   4   1   1000
 MHCnuggetsI   4   1   1000
@@ -8,7 +8,7 @@ NetMHC   4   1   1000
 NetMHCcons   8   8   500
 NetMHCpan   6   4   500
 NetMHCpanEL   6   4   500
-PickPocket   8   8   500
+PickPocket   10   8   500
 SMM   4   1   1000
 SMMPMBEC   4   1   1000
 DeepImmuno   4   1   1000
