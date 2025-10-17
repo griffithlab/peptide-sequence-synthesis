@@ -11,7 +11,7 @@ binding_algorithms = c("MHCflurry", "MHCnuggetsI", "NetMHC", "NetMHCcons", "NetM
 presentation_algorithms  = c("BigMHC_EL", "MHCflurryEL", "NetMHCpanEL")
 immunogenicity_algorithms = c("BigMHC_IM", "DeepImmuno", "PRIME")
 
-infile = "/Volumes/mgriffit/Active/immune/pvactools_percentiles/run_stats_100Kpeptides_v7.0.0a8_first-3-alleles.tsv"
+infile = "/Volumes/mgriffit/Active/immune/pvactools_percentiles/run_stats_100Kpeptides_v7.0.0a8_first-1000-alleles.tsv"
 
 rundata = read.table(infile, sep="\t", header=T)
 rundata = rundata %>% rename(Algorithm = ALGORITHM)
@@ -25,11 +25,18 @@ rundata$AlgorithmType = "Binding"
 rundata[which(rundata$Algorithm %in% presentation_algorithms), "AlgorithmType"] = "Present"
 rundata[which(rundata$Algorithm %in% immunogenicity_algorithms), "AlgorithmType"] = "Immuno"
 
-#convert run times to minuts and normalize by cpu count
+#convert run times to minutes and normalize by cpu count
 rundata$minutes = rundata$SECONDS/60
 rundata$cpu_minutes = (rundata$SECONDS * rundata$CPUs)/60
 
-plot_runtime = function(time_col, title_text, ybreaks){
+#other basic statistics
+unique_hlas=length(unique(rundata$HLA))
+unique_algs=length(unique(rundata$Algorithm))
+total_runs=length(unique(rundata$RUN_NAME))
+runtext = paste("Total runs: ", total_runs, ". Unique HLAs: ", unique_hlas, ". Unique algorithms: ", unique_algs, ".", sep="")
+
+plot_runtime = function(time_col, title_text, ybreaks, xadjust, yadjust, runtext){
+last_y_break = ybreaks[length(ybreaks)]
 p = ggplot(rundata, aes(x = Algorithm, y = !!ensym(time_col))) +
   # Violin plots
   geom_violin(trim = FALSE, fill = "gray90", color = "gray70") +
@@ -49,8 +56,9 @@ p = ggplot(rundata, aes(x = Algorithm, y = !!ensym(time_col))) +
     panel.grid.major.x = element_blank(),
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
+  ) + 
+  annotate("text", x = xadjust, y = last_y_break*yadjust, label = runtext, size = 5.5, hjust=0)
+  
 p + 
   geom_text(
     data = rundata, aes(x = Algorithm, y = 1.25, label = paste0(MEM, " GB")),
@@ -73,13 +81,17 @@ p +
 
 #plot for actual run time (not adjusted for CPU count)
 title_text = "Algorithm actual run times for 100k peptides"
-ybreaks=c(1,5,10,30,60,90,100,120,150,180,240,300,360,420)
-plot_runtime(minutes, title_text, ybreaks)
+ybreaks=c(1,5,30,60,120,180,240,300,360,420)
+xadjust=1.5
+yadjust=3
+plot_runtime(minutes, title_text, ybreaks, xadjust, yadjust, runtext)
 
 #Plot that accounts for different numbers of CPUs used for each job
 title_text = "Algorithm run times for 100k peptides after adjusting for CPU count (CPU*min)"
-ybreaks=c(1,5,10,30,60,120,240,360,480,600,1000,2000)
-plot_runtime(cpu_minutes, title_text, ybreaks)
+xadjust=1
+yadjust=1.5
+ybreaks=c(1,5,30,60,120,240,360,480,600,1200,2400)
+plot_runtime(cpu_minutes, title_text, ybreaks, xadjust, yadjust, runtext)
 
 
 
