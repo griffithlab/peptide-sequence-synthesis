@@ -5,7 +5,7 @@ library(scales)
 library(rlang)
 
 #Example input data file:
-#/Volumes/mgriffit/Active/immune/pvactools_percentiles/run_stats_100Kpeptides_v7.0.0a8_first-3-alleles.tsv
+#/Volumes/mgriffit/Active/immune/pvactools_percentiles/run_stats_100Kpeptides_v7.0.0a8_first-1000-alleles.tsv
 
 binding_algorithms = c("MHCflurry", "MHCnuggetsI", "NetMHC", "NetMHCcons", "NetMHCpan", "PickPocket", "SMM", "SMMPMBEC", "MixMHCpred")
 presentation_algorithms  = c("BigMHC_EL", "MHCflurryEL", "NetMHCpanEL")
