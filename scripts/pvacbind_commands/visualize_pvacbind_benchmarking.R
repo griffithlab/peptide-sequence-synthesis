@@ -77,7 +77,7 @@ ybreaks=c(1,5,10,30,60,90,100,120,150,180,240,300,360,420)
 plot_runtime(minutes, title_text, ybreaks)
 
 #Plot that accounts for different numbers of CPUs used for each job
-title_text = "Algorithm actual run times for 100k peptides"
+title_text = "Algorithm run times for 100k peptides after adjusting for CPU count (CPU*min)"
 ybreaks=c(1,5,10,30,60,120,240,360,480,600,1000,2000)
 plot_runtime(cpu_minutes, title_text, ybreaks)
 
