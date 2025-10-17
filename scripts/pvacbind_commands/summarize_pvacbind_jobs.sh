@@ -7,7 +7,7 @@ set -euo pipefail
 # Check inputs
 if [[ $# -ne 4 ]]; then
   echo -e "\nUsage: $0 <run_name_file> <base_directory> <stats_tsv_out_file> <final_results_directory>" >&2
-  echo -e "\ne.g.\n\n./peptide-sequence-synthesis/scripts/pvacbind_commands/summarize_pvacbind_jobs.sh run_names_100Kpeptides_v7.0.0a8_first-3-alleles.txt ./pvacbind_results/7.0.0a8 run_stats_100Kpeptides_v7.0.0a8_first-3-alleles.tsv ./final_scores/7.0.0a8\n\n" >&2
+  echo -e "\ne.g.\n\n./peptide-sequence-synthesis/scripts/pvacbind_commands/summarize_pvacbind_jobs.sh run_names_100Kpeptides_v7.0.0a8_first-1000-alleles.txt ./pvacbind_results/7.0.0a8 run_stats_100Kpeptides_v7.0.0a8_first-1000-alleles.tsv ./final_scores/7.0.0a8\n\n" >&2
   exit 1
 fi
 
