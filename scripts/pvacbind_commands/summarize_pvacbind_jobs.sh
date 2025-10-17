@@ -112,6 +112,6 @@ echo "Completed runs: $STATUS_COMPLETED_FILE_COUNT" >&1
 echo "Percent of runs completed: $PERCENT_RUNS_COMPLETED%" >&1
 echo "Scores files found: $SCORES_FILE_COUNT" >&1
 echo "Percent of scores files found: $PERCENT_SCORES_FILES_FOUND%" >&1
-echo "Total disk space used to all results: $DISK_USED" >&1
+echo "Total disk space used to store all results: $DISK_USED" >&1
 echo -e "\nWrote statistics to: $STATS_TSV\n" >&1
 

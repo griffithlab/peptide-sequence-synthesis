@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PEPTIDE_SET="100K"
-ALLELE_SET="first-3"
+ALLELE_SET="first-1000"
 PVACTOOLS_VERSION="7.0.0a8"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
