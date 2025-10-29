@@ -38,10 +38,13 @@ runtext = paste("Total runs: ", total_runs, ". Unique HLAs: ", unique_hlas, ". U
 plot_runtime = function(time_col, title_text, ybreaks, xadjust, yadjust, runtext){
 last_y_break = ybreaks[length(ybreaks)]
 p = ggplot(rundata, aes(x = Algorithm, y = !!ensym(time_col))) +
+  
+  # Individual data points (with jitter for visibility)
+  geom_jitter(aes(color=Length), width = 0.2, size = 2, alpha = 0.1) +
+  
   # Violin plots
   geom_violin(trim = FALSE, fill = "gray90", color = "gray70") +
-  # Individual data points (with jitter for visibility)
-  geom_jitter(aes(color=Length), width = 0.2, size = 2, alpha = 0.5) +
+  
   # Optional: overlay median or mean
   stat_summary(fun = median, geom = "point", shape = 23, size = 1, fill = "white") +
   scale_y_log10(breaks=ybreaks) +
