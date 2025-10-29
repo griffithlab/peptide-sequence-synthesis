@@ -37,13 +37,16 @@ echo -e "PVACTOOLS_VERSION\tRUN_NAME\tHLA\tLENGTH\tALGORITHM\tMEM\tCPUS\tFASTA_S
 STATUS_COMPLETED_FILE_COUNT=0
 SCORES_FILE_COUNT=0
 TOTAL_RUN_COUNT=$(cat ${RUN_NAME_FILE} | wc -l)
+COUNT=0
 
 # Loop through each run name
 while IFS= read -r RUN_NAME; do
   # Skip blank lines or comments
   [[ -z "$RUN_NAME" || "$RUN_NAME" =~ ^# ]] && continue
 
-  if [[ "$RUN_NAME" =~ ^LEN-([0-9]+)_((HLA-[A-Z]_?[0-9]+_[0-9]+))_ALG-(.+)$ ]]; then
+  #if [[ "$RUN_NAME" =~ ^LEN-([0-9]+)_((HLA-[A-Z]_?[0-9]+_[0-9]+))_ALG-(.+)$ ]]; then
+  if [[ "$RUN_NAME" =~ ^LEN-([0-9]+)_((HLA-[A-Z]_?[0-9]+_[0-9]+[A-Z]?))_ALG-(.+)$ ]]; then
+
     LEN="${BASH_REMATCH[1]}"
     HLA="${BASH_REMATCH[2]}"
     ALG="${BASH_REMATCH[4]}"
@@ -62,8 +65,9 @@ while IFS= read -r RUN_NAME; do
     echo "Warning: Run directory not found for '$RUN_NAME' — aborting" >&2
     exit 1
   fi
-
-  echo -e "\nExploring run: $RUN_NAME\n$RUN_DIR" >&2
+ 
+  ((COUNT += 1))
+  echo -e "\n$COUNT: Exploring run: $RUN_NAME\n$RUN_DIR" >&2
 
   #If the status completion file is found count it
   if [[ -f "$STATUS_COMPLETE_FILE" ]]; then
@@ -103,7 +107,7 @@ while IFS= read -r RUN_NAME; do
 
 done < "$RUN_NAME_FILE"
 
-echo "/usr/bin/du -h $BASE_DIR | tail -n1 | cut -f 1" >&2
+echo -e "\n/usr/bin/du -h $BASE_DIR | tail -n1 | cut -f 1" >&2
 DISK_USED=$(/usr/bin/du -h $BASE_DIR | tail -n1 | cut -f 1)
 
 #Summarize statistics
