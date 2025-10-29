@@ -35,6 +35,7 @@ fi
 echo -e "PVACTOOLS_VERSION\tRUN_NAME\tHLA\tLENGTH\tALGORITHM\tMEM\tCPUS\tFASTA_SIZE\tSECONDS\tSCORE_COUNT" > $STATS_TSV
 
 STATUS_COMPLETED_FILE_COUNT=0
+STATUS_RUNNING_FILE_COUNT=0
 SCORES_FILE_COUNT=0
 TOTAL_RUN_COUNT=$(cat ${RUN_NAME_FILE} | wc -l)
 COUNT=0
@@ -57,8 +58,8 @@ while IFS= read -r RUN_NAME; do
 
   RUN_DIR=${BASE_DIR}/${LEN}/${ALG}/${RUN_NAME}
   STATUS_COMPLETE_FILE="$RUN_DIR/$RUN_NAME.status.completed"
+  STATUS_RUNNING_FILE="$RUN_DIR/$RUN_NAME.status.running"
   SCORES_FILE="$RUN_DIR/$RUN_NAME.scores.tsv.gz"
-
 
   #Make sure the run directory was found
   if [[ ! -d "$RUN_DIR" ]]; then
@@ -69,12 +70,19 @@ while IFS= read -r RUN_NAME; do
   ((COUNT += 1))
   echo -e "\n$COUNT: Exploring run: $RUN_NAME\n$RUN_DIR" >&2
 
-  #If the status completion file is found count it
+  #If the status completion file is found, count it
   if [[ -f "$STATUS_COMPLETE_FILE" ]]; then
     ((STATUS_COMPLETED_FILE_COUNT += 1))
+    echo -e "\t$STATUS_COMPLETED_FILE_COUNT: Found status completion file for run: $RUN_NAME" >&2
   else
     echo -e "\tMissing status completion file for run: $RUN_NAME" >&2
     echo -e "\t$RUN_DIR" >&2
+  fi
+
+  #If the status running file is found, count it
+  if [[ -f "$STATUS_RUNNING_FILE" ]]; then
+    ((STATUS_RUNNING_FILE_COUNT += 1))
+    echo -e "\t$STATUS_RUNNING_FILE_COUNT: Found status running file for run: $RUN_NAME" >&2
   fi
 
   #If the scores file is found count it and create a copy
@@ -89,9 +97,11 @@ while IFS= read -r RUN_NAME; do
 
   #Calculate the percent completion
   if (( TOTAL_RUN_COUNT > 0 )); then
+    PERCENT_RUNS_RUNNING=$(awk "BEGIN {printf \"%.1f\", ($STATUS_RUNNING_FILE_COUNT / $TOTAL_RUN_COUNT) * 100}")
     PERCENT_RUNS_COMPLETED=$(awk "BEGIN {printf \"%.1f\", ($STATUS_COMPLETED_FILE_COUNT / $TOTAL_RUN_COUNT) * 100}")
     PERCENT_SCORES_FILES_FOUND=$(awk "BEGIN {printf \"%.1f\", ($SCORES_FILE_COUNT / $TOTAL_RUN_COUNT) * 100}")
   else
+    PERCENT_RUNS_RUNNING=0
     PERCENT_RUNS_COMPLETED=0
     PERCENT_SCORES_FILES_FOUND=0
   fi
@@ -112,6 +122,8 @@ DISK_USED=$(/usr/bin/du -h $BASE_DIR | tail -n1 | cut -f 1)
 
 #Summarize statistics
 echo -e "\nTotal runs: $TOTAL_RUN_COUNT" >&1
+echo "Running runs (all runs with .running status file): $STATUS_RUNNING_FILE_COUNT" >&1
+echo "Percent of runs running: $PERCENT_RUNS_RUNNING%" >&1
 echo "Completed runs: $STATUS_COMPLETED_FILE_COUNT" >&1
 echo "Percent of runs completed: $PERCENT_RUNS_COMPLETED%" >&1
 echo "Scores files found: $SCORES_FILE_COUNT" >&1
