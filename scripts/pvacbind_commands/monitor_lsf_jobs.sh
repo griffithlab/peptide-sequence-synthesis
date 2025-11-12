@@ -5,8 +5,8 @@ ALLELE_SET="first-1000"
 PVACTOOLS_VERSION="7.0.0a8"
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
-RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
-RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
+RUN_COMMAND_FILE="${WORKING_BASE}/full_run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+RUN_NAME_FILE="${WORKING_BASE}/full_run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
 SHORT_PAUSE=10
 LONG_PAUSE=300
 
@@ -17,13 +17,21 @@ JOB_GROUP="/mgriffit/perc"
 mapfile -t COMMANDS < ${RUN_COMMAND_FILE}
 mapfile -t NAMES < ${RUN_NAME_FILE}
 
+if [[ ${#COMMANDS[@]} -ne ${#NAMES[@]} ]]; then
+  echo "Error: Number of commands (${#COMMANDS[@]}) must the match number of names (${#NAMES[@]})." >&2
+  exit 1
+fi
+
 #In an infinite loop with a 5 min pause between iterations. Do the following
 for i in "${!COMMANDS[@]}"; do
     RUN_NAME="${NAMES[$i]}"
     CMD="${COMMANDS[$i]}"
-    if [[ $line =~ LEN-([0-9]+)_.*_ALG-(.+)$ ]]; then
+    if [[ $RUN_NAME =~ LEN-([0-9]+)_.*_ALG-(.+)$ ]]; then
       LEN="${BASH_REMATCH[1]}"
       ALGO="${BASH_REMATCH[2]}"
+    else
+      echo "Error: Line does not match expected pattern: $RUN_NAME"
+      exit 1
     fi
 
     FINAL_OUTDIR=${RESULTS_BASE}/${PVACTOOLS_VERSION}/${LEN}/${ALGO}/${RUN_NAME}
@@ -37,7 +45,7 @@ for i in "${!COMMANDS[@]}"; do
     echo -e "\nJob count: $RUN_COUNT"
     echo -e "Checking status of job: $RUN_NAME"
     echo -e "Check for existence of status files for running or completed jobs"
-
+    
     if [[ -f "$STATUS_FILE_RUNNING" ]]; then
         echo "Skipping $RUN_NAME — running status file exists: $STATUS_FILE_RUNNING"
         continue   # go straight to next iteration

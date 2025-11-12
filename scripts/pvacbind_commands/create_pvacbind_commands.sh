@@ -17,8 +17,10 @@ ALG_RESOURCES_FILE=$SCRIPT_BASE/algorithm_info/classI_algorithm_resources_${PVAC
 VALID_KEYS_FILE=$SCRIPT_BASE/algorithm_allele_length_key/Length-HLA-Algorithm_Keys_${PVACTOOLS_VERSION}.txt
 
 #outputs
-RUN_COMMAND_FILE="${WORKING_BASE}/run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
-RUN_NAME_FILE="${WORKING_BASE}/run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
+FULL_RUN_COMMAND_FILE="${WORKING_BASE}/full_run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+PEND_RUN_COMMAND_FILE="${WORKING_BASE}/pend_run_commands_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.sh"
+FULL_RUN_NAME_FILE="${WORKING_BASE}/full_run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
+PEND_RUN_NAME_FILE="${WORKING_BASE}/pend_run_names_${PEPTIDE_SET}peptides_v${PVACTOOLS_VERSION}_${ALLELE_SET}-alleles.txt"
 
 #other parameters
 LENGTHS=(8 9 10 11)
@@ -53,8 +55,10 @@ done < "$VALID_KEYS_FILE"
 echo "Loaded ${#VALID_KEYS[@]} valid keys."
 
 #Initialize two files to hold the LSF commands and unique Run names:
-> $RUN_COMMAND_FILE
-> $RUN_NAME_FILE
+> $FULL_RUN_COMMAND_FILE
+> $PEND_RUN_COMMAND_FILE
+> $FULL_RUN_NAME_FILE
+> $PEND_RUN_NAME_FILE
 
 # Read HLA allele name into an array from the input file
 echo -e "\nLoading prioritized alleles file:"
@@ -114,14 +118,20 @@ for HLA in "${HLA_ALLELES[@]}"; do
       fi
       
       #Store the name of the valid run (even if already complete)
-      echo $RUN_NAME >> $RUN_NAME_FILE
+      echo $RUN_NAME >> $FULL_RUN_NAME_FILE
+
+      #Store the command even if the job is already complete
+      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $FULL_RUN_COMMAND_FILE
 
       #If the completed status file exists then leave it untouched and continue
       if [[ -f "$STATUS_FILE_COMPLETED" ]]; then
         echo -e "\tCompletion status files exist for $RUN_NAME — skipping to next"
         continue
       fi
-      
+     
+      #Store the name of the valid run that still needs to be completed
+      echo $RUN_NAME >> $PEND_RUN_NAME_FILE
+
       #If the dir already exists, but the completion status file was NOT found - start fresh
       if [[ -d "$FINAL_OUTDIR" ]]; then
         echo -e "\t$FINAL_OUTDIR exists but run not completed — emptying run directories..."
@@ -196,11 +206,13 @@ for HLA in "${HLA_ALLELES[@]}"; do
 
       #Create the bsub command to run this script on the cluster
       #Note if any jobs were already completed they will not be included here
-      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $RUN_COMMAND_FILE
+      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $PEND_RUN_COMMAND_FILE
     done
   done
 done
 
-echo -e "\nWrote all LSF commands to $RUN_COMMAND_FILE"
-echo "Wrote a corresponding list of run names to $RUN_NAME_FILE"
+echo -e "\nWrote all LSF commands to $FULL_RUN_COMMAND_FILE"
+echo -e "\nWrote LSF commands for runs to be completed to $PEND_RUN_COMMAND_FILE"
+echo "Wrote a list of all run names (regardless of status) to $FULL_RUN_NAME_FILE"
+echo "Wrote a list of run names for runs to be completed to $PEND_RUN_NAME_FILE"
 
