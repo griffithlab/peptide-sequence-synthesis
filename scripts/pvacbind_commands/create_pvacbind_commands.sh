@@ -4,7 +4,8 @@
 PEPTIDE_SET="100K"
 ALLELE_SET="first-1000"
 DOCKERHUB_ORG="susannakiwala" #susannakiwala / griffithlab
-PVACTOOLS_VERSION="7.0.0a8"
+PVACTOOLS_VERSION="7.0.0a8" 
+PVACTOOLS_VERSION2="7.0.0a12" #Try version 7.0.0a12 for PRIME alleles fix - use only for docker image, keep input/results paths constant
 WORKING_BASE=/storage1/fs1/mgriffit/Active/immune/pvactools_percentiles
 SCRIPT_BASE=$WORKING_BASE/peptide-sequence-synthesis/scripts/pvacbind_commands
 RESULTS_BASE=$WORKING_BASE/pvacbind_results
@@ -121,7 +122,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo $RUN_NAME >> $FULL_RUN_NAME_FILE
 
       #Store the command even if the job is already complete
-      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $FULL_RUN_COMMAND_FILE
+      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION2})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $FULL_RUN_COMMAND_FILE
 
       #If the completed status file exists then leave it untouched and continue
       if [[ -f "$STATUS_FILE_COMPLETED" ]]; then
@@ -147,7 +148,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "echo \"Run script started for $RUN_NAME\" > $STATUS_FILE_RUNNING" >> $SCRIPT_FILE
       echo "set -euo pipefail" >> $SCRIPT_FILE
       echo "date" >> $SCRIPT_FILE
-      echo "echo \"Using pvactools version: $PVACTOOLS_VERSION\"" >> $SCRIPT_FILE
+      echo "echo \"Using pvactools version: $PVACTOOLS_VERSION2\"" >> $SCRIPT_FILE
       echo "echo \"Generating predictions for $RUN_NAME\"" >> $SCRIPT_FILE
       echo "mkdir -p $SCRATCH_OUTDIR" >> $SCRIPT_FILE
       echo "pvacbind run $PEPTIDE_SET_FILE $RUN_NAME $HLA $ALGO $SCRATCH_OUTDIR --class-i-epitope-length $LEN --n-threads $CPUS --iedb-install-directory /opt/iedb --fasta-size $FASTA_SIZE" >> $SCRIPT_FILE
@@ -182,7 +183,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo date >> $SCRIPT_FILE
 
       #output other basic information about this run (source of inputs, resources used, etc.) so that it gets saved in stdout
-      echo "echo -e \"\nRUN INFORMATION:\nRUN_NAME: $RUN_NAME\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION\nALLELES_FILE: $ALLELES_FILE\nPEPTIDE_SET_FILE: $PEPTIDE_SET_FILE\"" >> $SCRIPT_FILE
+      echo "echo -e \"\nRUN INFORMATION:\nRUN_NAME: $RUN_NAME\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION2\nALLELES_FILE: $ALLELES_FILE\nPEPTIDE_SET_FILE: $PEPTIDE_SET_FILE\"" >> $SCRIPT_FILE
 
       #report on how long this run took
       echo "elapsed=\$SECONDS" >> $SCRIPT_FILE
@@ -194,7 +195,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
       echo "echo \"Run took \$SECONDS seconds to complete\"" >> $SCRIPT_FILE
       
       #output stats for benchmarking
-      echo "echo -e \"\nBENCHMARKING STATISTICS\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION\nRUN_NAME: $RUN_NAME\nHLA: $HLA_NAME\nLENGTH: $LEN\nALGORITHM: $ALGO\nMEM: $MEM\nCPUS: $CPUS\nFASTA_SIZE: $FASTA_SIZE\"" >> $SCRIPT_FILE
+      echo "echo -e \"\nBENCHMARKING STATISTICS\nPVACTOOLS_VERSION: $PVACTOOLS_VERSION2\nRUN_NAME: $RUN_NAME\nHLA: $HLA_NAME\nLENGTH: $LEN\nALGORITHM: $ALGO\nMEM: $MEM\nCPUS: $CPUS\nFASTA_SIZE: $FASTA_SIZE\"" >> $SCRIPT_FILE
       echo "echo \"SECONDS: \$SECONDS\"" >> $SCRIPT_FILE
       echo "echo -e \"SCORE_COUNT: \$SCORE_COUNT\n\"" >> $SCRIPT_FILE
 
@@ -206,7 +207,7 @@ for HLA in "${HLA_ALLELES[@]}"; do
 
       #Create the bsub command to run this script on the cluster
       #Note if any jobs were already completed they will not be included here
-      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $PEND_RUN_COMMAND_FILE
+      echo -e "LSF_DOCKER_PRESERVE_ENVIRONMENT=false bsub -M $MEM_LONG -G $COMPUTE_GROUP -n $CPUS -R 'select[mem>$MEM_SHORT] rusage[mem=$MEM_SHORT]' -q $QUEUE -g $JOB_GROUP -a 'docker(${DOCKERHUB_ORG}/pvactools:${PVACTOOLS_VERSION2})' -oo $FINAL_OUTDIR/pvacbind.stdout -eo $FINAL_OUTDIR/pvacbind.stderr /bin/bash $SCRIPT_FILE" >> $PEND_RUN_COMMAND_FILE
     done
   done
 done
